@@ -1,0 +1,114 @@
+version: '3.7'
+services:
+
+  traefik:
+    image: traefik:latest
+    command:
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls.certResolver=default"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      - "--certificatesResolvers.default.acme.email=hantsawilliams@gmail.com"
+      - "--certificatesResolvers.default.acme.storage=/data/acme.json"
+      - "--certificatesResolvers.default.acme.tlsChallenge=true"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik-ssl:/data/"
+    ports:
+      - target: 80
+        protocol: tcp
+        published: 80
+        mode: ingress
+      - target: 443
+        protocol: tcp
+        published: 443
+        mode: ingress
+    networks:
+      - public
+
+  server:
+    image: ghcr.io/bidmcdigitalpsychiatry/lamp-server:2022
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+    ports:
+      - 3000:3000
+    environment:
+      HTTPS: 'off'
+      ROOT_KEY: '57874cf5bcdd7acc8b4e76e8108db7fe7a1f9cd1583f41da2e187951597c14bd'
+      DB: 'mongodb://admin:95883cbd4d258488@database:27017/'
+      PUSH_API_GATEWAY: 'https://app-gateway.lamp.digital/'
+      PUSH_API_KEY: 'YOUR_PUSH_KEY_HERE'
+      DASHBOARD_URL: 'dashboard.lamp.digital'
+      REDIS_HOST: 'redis://cache:6379/0'
+      NATS_SERVER: 'message_queue:4222'
+    networks:
+      - default
+      - public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.routers.lamp_server.entryPoints=websecure
+      - traefik.http.routers.lamp_server.rule=Host(`mindlamp.api.appliedhealthinformatics.com`)
+      - traefik.http.routers.lamp_server.tls.certresolver=default
+      - traefik.http.services.lamp_server.loadbalancer.server.port=3000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  database:
+    image: mongo:6.0.4
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'admin'
+      MONGO_INITDB_ROOT_PASSWORD: '95883cbd4d258488'
+    volumes:
+      - /data/db:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - public
+
+  cache:
+    image: redis:6.0.8-alpine
+    healthcheck:
+      test: redis-cli ping
+
+  message_queue:
+    image: nats:2.1.9-alpine3.12
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8222/varz || exit 1
+
+  dashboard:
+    image: ghcr.io/bidmcdigitalpsychiatry/lamp-dashboard:2023
+    logging:
+        driver: "json-file"
+        options:
+          max-size: "50m"
+    environment:
+      REACT_APP_LAMP_RESEARCHER_ALIAS: 'Investigator'
+    networks:
+      - public
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+    labels:
+      - portainer.autodeploy=true
+      - traefik.enable=true
+      - traefik.http.routers.lamp_dashboard.entryPoints=websecure
+      - traefik.http.routers.lamp_dashboard.rule=Host(`mindlamp.dashboard.appliedhealthinformatics.com`)
+      - traefik.http.routers.lamp_dashboard.tls.certresolver=default
+      - traefik.http.services.lamp_dashboard.loadbalancer.server.port=80
+
+
+networks:
+  public:
+    external: true
+
+volumes:
+  traefik-ssl:
