@@ -57,7 +57,7 @@ test_data = {
 
 ## Setting up Activities 
 
-```
+```python
 import requests
 
 endpoint = 'https://mindlamp.api.appliedhealthinformatics.com/sensor_spec'
@@ -66,10 +66,10 @@ headers = {
     'Authorization': 'Basic {USER}:{PASSWORD},
     }
 ```
-```
+```python
 bodytosend = {"name":"lamp.activity_recognition"}
 ```
-```
+```python
 response = requests.post(endpoint, headers=headers, json=bodytosend)
 response.status_code
 response.text
