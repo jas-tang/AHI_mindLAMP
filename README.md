@@ -15,7 +15,7 @@ Sections to include:
 
 
 
-## instructions
+## Setting up the Server
 - Modified the docker-compose to include traefik in it 
 - Modified to remove swarm, this is just for testing purposes
 
@@ -54,3 +54,26 @@ test_data = {
 
 
 ## api notes for pulling down dummy data 
+
+## Setting up Activities 
+
+```
+import requests
+
+endpoint = 'https://mindlamp.api.appliedhealthinformatics.com/sensor_spec'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic {USER}:{PASSWORD},
+    }
+```
+```
+bodytosend = {"name":"lamp.activity_recognition"}
+```
+```
+response = requests.post(endpoint, headers=headers, json=bodytosend)
+response.status_code
+response.text
+```
+https://docs.lamp.digital/start_here/instruments
+for list of surveys that can be uploaded
+
