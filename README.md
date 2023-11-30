@@ -60,15 +60,27 @@ test_data = {
 Go to this [link](https://docs.lamp.digital/start_here/instruments) to download all the available surveys in JSON formatting. 
 
 Create an Investigator by clicking the add button. 
-
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/1.png)
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/2.JPG)
 
 Create a user with a group. 
-
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/3.JPG)
 
 Add and import activities. 
-
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/4.png)
 
 Add the JSON files for the surveys here. 
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/5.png)
+
+## Setting up Activities / Games
+
+WIP
+
+## Setting up Sensors
+
+Start by importing the package, requests. 
+
+We are going to use an HTTP Post request to an endpoint to post sensors to mindLAMP. 
 
 
 ```python
