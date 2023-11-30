@@ -55,9 +55,11 @@ test_data = {
 
 ## api notes for pulling down dummy data 
 
-## Setting up Surveys
+## Logging in as as an Admin
 
-Go to this [link](https://docs.lamp.digital/start_here/instruments) to download all the available surveys in JSON formatting. 
+WIP
+
+## Creating an Investigator and your first User
 
 Create an Investigator by clicking the add button. 
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/1.png)
@@ -66,11 +68,16 @@ Create an Investigator by clicking the add button.
 Create a user with a group. 
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/3.JPG)
 
-Add and import activities. 
-![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/4.png)
 
-Add the JSON files for the surveys here. 
+## Setting up Surveys
+
+Go to this [link](https://docs.lamp.digital/start_here/instruments) to download all the available surveys in JSON formatting. 
+
+From the user or group you created, add the JSON files for the surveys here. 
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/5.png)
+
+Add and import activities. Surveys are listed as activities. 
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/4.png)
 
 ## Setting up Activities / Games
 
@@ -115,7 +122,7 @@ The Sensors should now be able to be added to a user/group from this screen.
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/6.JPG)
 
 
-## Creating Users/User Groups
+## Creating additional Users/User Groups
 Return this this screen to create a User or Group. 
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/3.JPG)
 
@@ -123,3 +130,17 @@ It's important to note to create multiple users if you have multiple, separate p
 This will be important later when we try to extract the data.
 
 ## Assigning Credentials
+Go back to the user screen and click on the key icon to manage credentials. 
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/7.png)
+
+Press the '+' icon to create additional credentials.  
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/8.JPG)
+
+Fill in the information needed for the user.  
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/9.JPG)
+
+After which, the user can log in with the newly created credentials. Each participant ID, meaning each user or user group you created, can have multiple credentials. 
+Assigning multiple credentials however, does not create more users or user groups. Instead, create additional users or user groups and assign credentiaals to them as needed.
+
+## User Perspective
+WIP
