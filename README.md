@@ -55,7 +55,21 @@ test_data = {
 
 ## api notes for pulling down dummy data 
 
-## Setting up Activities 
+## Setting up Surveys
+
+Go to this [link](https://docs.lamp.digital/start_here/instruments) to download all the available surveys in JSON formatting. 
+
+Create an Investigator by clicking the add button. 
+
+
+Create a user with a group. 
+
+
+Add and import activities. 
+
+
+Add the JSON files for the surveys here. 
+
 
 ```python
 import requests
