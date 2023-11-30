@@ -112,5 +112,14 @@ print(response.text)
 ```
 
 The Sensors should now be able to be added to a user/group from this screen. 
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/6.JPG)
 
 
+## Creating Users/User Groups
+Return this this screen to create a User or Group. 
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/3.JPG)
+
+It's important to note to create multiple users if you have multiple, separate people using the application. When creating a new user, a new participant ID will be generated for each individual. 
+This will be important later when we try to extract the data.
+
+## Assigning Credentials
