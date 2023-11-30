@@ -80,26 +80,37 @@ WIP
 
 Start by importing the package, requests. 
 
-We are going to use an HTTP Post request to an endpoint to post sensors to mindLAMP. 
-
+We are going to use an HTTP Post request to an endpoint to post sensors to the mindLAMP API. 
 
 ```python
 import requests
+```
 
-endpoint = 'https://mindlamp.api.appliedhealthinformatics.com/sensor_spec'
+Set endpoint equal to your endpoint. 
+```python
+endpoint = 'https://mindlamp.api.{YOUR_ENDPOINT}.com/sensor_spec'
+```
+
+Next, we include the headers in the HTTP request. The headers specify the content type to JSON and includes the authentication needed. 
+```python
 headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Basic {USER}:{PASSWORD},
     }
 ```
+
+Next, we include what is needed from the POST request. Replace "activity_recognition" with any of the Sensor types you need from this [link](https://docs.lamp.digital/using/sensors/). 
 ```python
 bodytosend = {"name":"lamp.activity_recognition"}
 ```
+
+Now, we create the HTTP POST request and print out the results. 
 ```python
 response = requests.post(endpoint, headers=headers, json=bodytosend)
-response.status_code
-response.text
+print(response.status_code)
+print(response.text)
 ```
-https://docs.lamp.digital/start_here/instruments
-for list of surveys that can be uploaded
+
+The Sensors should now be able to be added to a user/group from this screen. 
+
 
