@@ -156,7 +156,7 @@ import LAMP
 ```
 
 As an administrator, you can see researcher IDs on the data portal screen. 
-insert image
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/13.JPG)
 
 Alternatively, you can perform a get request. 
 
@@ -172,7 +172,7 @@ response = LAMP.Researcher.list()
 
 ### Getting the User ID. 
 We can get each user's User ID by clicking on each user as a researcher. 
-insert image
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/14.JPG)
 
 Alternatively, after getting your researcher ID, we can get all the User IDs by one researcher. 
 
@@ -232,7 +232,7 @@ base_url = 'https://mindlamp.api.yourendpoint.com/'
 Set up your credentials
 ```python
 user = 'user'
-passweord = 'password'
+password = 'password'
 ```
 
 Set up participant ID
@@ -255,7 +255,8 @@ print("Response Text:", response.text)
 
 ### Alternate Method using Dashboard
 If you do not want to use Python, you can download a CSV file from this screen using the download feature underneath the researcher. 
-insert image
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/13.JPG)
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/15.JPG)
 
 ## Issues found in mindLAMP Official Documentation
 
