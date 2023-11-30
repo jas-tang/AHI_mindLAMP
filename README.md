@@ -48,7 +48,8 @@ test_data = {
 
 ## Logging in as as an Admin
 
-WIP
+Input your server address, username, and generated password.  
+![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/16.JPG)
 
 ## Creating an Investigator and your first User
 
