@@ -73,7 +73,89 @@ Add and import activities. Surveys are listed as activities.
 
 ## Setting up Activities / Games
 
-WIP
+Coding Activities / Games into mindLAMP requires knowing the name of the game and the parameters. See sample code below for more information.
+
+Start by importing the requests packages.
+
+Determine your endpoint.
+```python
+endpoint = 'https://mindlamp.api.{YOUR_ENDPOINT}.com/activity_spec'
+```
+
+Enter in the appropriate header information.
+```python
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic {USER}:{PASSWORD},
+    }
+```
+
+The following is sample code for the balloon risk game:
+```python
+bodytosend = {
+    'name': 'lamp.balloon_risk',
+   'balloon_count': 15,
+   'breakpoint_mean': 64.5,
+   'breakpoint_std': 37,
+   'static_data': {'points': 55},
+   'temporal_slices': [
+       {'duration': 1821, 'item': 1, 'level': 1, 'type': True, 'value': 1},
+       {'duration': 876, 'item': 2, 'level': 1, 'type': True, 'value': 1},
+       {'duration': 425, 'item': 3, 'level': 1, 'type': True, 'value': 1},
+       {'duration': 167, 'item': 8, 'level': 1, 'type': True, 'value': 1},
+       # ... other entries ...
+       {'duration': 151, 'item': 74, 'level': 2, 'type': True, 'value': 1},
+       {'duration': 178, 'item': 75, 'level': 2, 'type': True, 'value': 1},
+       {'duration': 161, 'item': 76, 'level': 2, 'type': False, 'value': 0},
+       # ... other entries ...
+       {'duration': 809, 'item': 1, 'level': 15, 'type': True, 'value': 1}
+   ],
+   'timestamp': 1642779164213,
+   'duration': 78365,
+   'activity': '8vw829aemgdxy8f1fvk9'
+}
+```
+The of this activity is lamp.balloon_risk, the following information after can be adjusted.
+
+Another example:
+
+```python
+bodytosend = {
+    'name': "lamp.cats_and_dogs",
+   'duration': 445841,
+   'static_data': 
+   {'StartTime': None, 'correct_answers': 22, 'point': 1, 'score': 49, 'type': 1, 'wrong_answers': 1},
+   'temporal_slices': 
+   [{'duration': 5243, 'item': 9, 'level': 1,'type': True,'value': None},
+    {'duration': 2611, 'item': 5, 'level': 1, 'type': True, 'value': None},
+    {'duration': 1125, 'item': 8, 'level': 1, 'type': True, 'value': None},
+    {'duration': 2688, 'item': 2, 'level': 1, 'type': True, 'value': None},
+    {'duration': 946, 'item': 3, 'level': 1, 'type': True, 'value': None},
+    {'duration': 1000, 'item': 4, 'level': 1, 'type': True, 'value': None},
+    {'duration': 4568, 'item': 4, 'level': 1, 'type': True, 'value': None},
+    {'duration': 1035, 'item': 6, 'level': 1, 'type': True, 'value': None},
+    {'duration': 843, 'item': 3, 'level': 1, 'type': True, 'value': None},
+    {'duration': 798, 'item': 2, 'level': 1, 'type': True, 'value': None},
+    {'duration': 4298, 'item': 1, 'level': 1, 'type': True, 'value': None},
+    {'duration': 854, 'item': 8, 'level': 1, 'type': True, 'value': None},
+    {'duration': 1397, 'item': 5, 'level': 1, 'type': True, 'value': None},
+    {'duration': 885, 'item': 9, 'level': 1, 'type': True, 'value': None},
+    {'duration': 4338, 'item': 10, 'level': 1, 'type': True, 'value': None},
+    {'duration': 624, 'item': 9, 'level': 1, 'type': True, 'value': None},
+    {'duration': 2846, 'item': 3, 'level': 1, 'type': True, 'value': None},
+    {'duration': 2002, 'item': 8, 'level': 2, 'type': False, 'value': None},
+    {'duration': 1981, 'item': 5, 'level': 2, 'type': True, 'value': None},
+    {'duration': 731, 'item': 3, 'level': 2, 'type': True, 'value': None},
+    {'duration': 4555, 'item': 4, 'level': 2, 'type': True, 'value': None},
+    {'duration': 1608, 'item': 3, 'level': 2, 'type': True, 'value': None},
+    {'duration': 910, 'item': 5, 'level': 2, 'type': True, 'value': None}],
+   'timestamp': 1649447701749,
+   'activity': 'sjfvrd7jpjyjzbkgwex4'
+}
+```
+The name for this game is lamp.cats_and_dogs and note that there is the same timestamp and activity section but no duration for this section. Those last sections are considered optional according to the documentation.
+
+More information can be found here: [link](https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/tree/master) and [link](https://docs.lamp.digital/develop/build_new_activities)
 
 ## Setting up Sensors
 
