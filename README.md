@@ -155,6 +155,15 @@ bodytosend = {
 ```
 The name for this game is lamp.cats_and_dogs and note that there is the same timestamp and activity section but no duration for this section. Those last sections are considered optional according to the documentation.
 
+From there you should push these games into the API.
+```python
+response = requests.post(endpoint, headers=headers, json=bodytosend)
+response.status_code
+response.text
+```
+
+And you're done!
+
 More information can be found here: [link](https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/tree/master) and [link](https://docs.lamp.digital/develop/build_new_activities)
 
 ## Setting up Sensors
@@ -343,4 +352,64 @@ If you do not want to use Python, you can download a CSV file from this screen u
 
 ## Issues found in mindLAMP Official Documentation
 
-- INSERT DOCUMENTATION HERE FOR ISSUES THAT YOU PREVIOUSLY FOUND 
+- INSERT DOCUMENTATION HERE FOR ISSUES THAT YOU PREVIOUSLY FOUND
+
+Posted code:
+```python import LAMP
+import pandas as pd 
+LAMP.connect("MY_EMAIL_ADDRESS_HERE", "MY_PASSWORD_HERE")
+
+for participant in LAMP.Participant.all_by_researcher("me")['data']:
+    data = []
+    events = LAMP.SensorEvent.all_by_participant(participant['id'], origin='lamp.gps.contextual')['data']
+    for event in events:
+        data.append({
+            'timestamp': event['timestamp'],
+            'UTC time': "",
+            'latitude': event['data']['latitude'],
+            'longitude': event['data']['longitude'],
+            'altitude': 1.0,
+            'accuracy': 1.0
+        })
+    # Don't make CSV files for participants without any `lamp.gps.contextual` events.
+    if len(data) > 0:
+        pd.DataFrame.from_dict(data, orient='columns').to_csv(f"{participant['id']}.csv", index=False)
+```
+
+This code was not able to pull down all the data. Also the data that was pulled did not include everything.
+
+Fixed code:
+```python
+import pandas as pd
+
+participant_1 = "U1679776962"
+activity_events = LAMP.ActivityEvent.all_by_participant(participant_1)['data']
+events = LAMP.SensorEvent.all_by_participant(participant_1, origin='lamp.gps.contextual')['data']
+
+data = []
+
+for index, activity_event in enumerate(activity_events):
+    print(f"Activity Event {index + 1}: {activity_event}")
+    
+    if 'temporal_slices' in activity_event:
+        for slice_data in activity_event['temporal_slices']:
+            data.append({
+                'event_type': 'Mental Health Assessment',
+                'timestamp': activity_event['timestamp'],
+                'item': slice_data['item'],
+                'value': slice_data['value'],
+                'duration': slice_data['duration']
+            })
+    elif 'static_data' in activity_event:
+        data.append({
+            'event_type': 'Game or Task',
+            'timestamp': activity_event['timestamp'],
+            'score': activity_event['static_data']['score'],
+            'total_attempts': activity_event['static_data']['total_attempts'],
+        })
+
+if len(data) > 0:
+    df1 = pd.DataFrame(data)
+    print(df1.head(20))
+```
+This code also creates a dataframe for data analysis.
