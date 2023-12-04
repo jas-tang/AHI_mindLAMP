@@ -1,25 +1,89 @@
 # AHI_mindLAMP
-Test Environment for mindLAMP for AHI Program
-WIP
+This repository is dedicated to establishing a Test Environment for mindLAMP as part of the Applied Health Informatics Program. 
 
-Sections to include: 
-* Setting up the Server
-* Setting up Activities 
-* Setting up Sensors 
-* Creating Users/User Groups
-* Assigning Credentials
-* Adding Activities and Sensors
-* User Perspective
-* Extracting data using Python 
-* Extracting data using Requests
+The LAMP Platform is a solution for neuropsychiatric research and clinical care management. It was specifically created to streamline the administration of resarch sutdies and digitally-enabled clinics.
+It uses numerous components to automate workflows, offering a simplified approach to clinical and data management. 
 
+The patients or users uses the mindLAMP app, which can be downloaded on a mobile device on the AppStore whether it be an iOS or Android device. They will take part in taking surveys, playing cognitive games, or doing
+other activites to collect active data. The app also collects passive data through Sensor events. This includes the mobile device's accelerometer, GPS, pedometer, and other background capabilities. 
 
+Clinicians and Researchers can use a dashboard to create, customize, and schedule activities for the patients to interact with. The dashboard has a fully functioning Data Portal for a better view and extraction function for the data. 
 
 ## Setting up the Server
-- Modified the docker-compose to include traefik in it 
+- Modified the docker-compose to include traefik in it
+```
+Docker Stack: **traefik.yml**
+```
 - Modified to remove swarm, this is just for testing purposes
 
 ## How to Deploy
+Create a new network called public to connect all externally accessible services.
+```
+docker network create --driver overlay --attachable public
+```
+
+Using your DNS provider of choice, provision a domain name (here we use [example.com](http://example.com) to represent your domain name and 1.1.1.1 to represent your node's IP address).
+
+Replace administrator@example.com with your configuration variable. 
+```
+version: "3.7"
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls.certResolver=default"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      - "--certificatesResolvers.default.acme.email=administrator@example.com"
+      - "--certificatesResolvers.default.acme.storage=/data/acme.json"
+      - "--certificatesResolvers.default.acme.tlsChallenge=true"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik-ssl:/data/"
+    ports:
+      - target: 80
+        protocol: tcp
+        published: 80
+        mode: ingress
+      - target: 443
+        protocol: tcp
+        published: 443
+        mode: ingress
+    networks:
+      - public
+    deploy:
+      mode: replicated
+      placement:
+        constraints:
+          - node.role == manager
+networks:
+  public:
+    external: true
+volumes:
+  traefik-ssl:
+```
+```
+docker stack deploy --compose-file traefik.yml router
+```
+
+Create a /data folder in the node that will be hosting the database. 
+```
+mkdir -p /data/db
+```
+
+```
+openssl rand -hex 8 # DB_PASSWORD_HERE
+openssl rand -hex 32 # ROOT_ENCRYPTION_KEY_HERE
+```
 - When it first runs, it will generate an admin password that you will be able to see in the terminal, it will look something like:
 ```
 server_1         |       ┌────────────────────────┬────────────────────────────────────────────────────────────────────┐
@@ -28,6 +92,49 @@ server_1         |       ├─────────────────�
 server_1         |       │ Administrator Password │ '34b8b1................f6cd' │
 server_1         |       └────────────────────────┴────────────────────────────────────────────────────────────────────┘
 
+```
+
+To self host the LAMP dashboard, replace this variables with your custom configuration variables.
+
+* dashboard.example.com [The address you will use to access the LAMP dashboard. (If deploying the dashboard)]
+* ROOT_ENCRYPTION_KEY_HERE 
+* DB_PASSSWORD_HERE 
+* YOUR_PUSH_KEY_HERE 
+* api.example.com 
+
+```
+version: '3.7'
+services:
+  dashboard:
+    image: ghcr.io/bidmcdigitalpsychiatry/lamp-dashboard:2023
+    logging:
+        driver: "json-file"
+        options:
+          max-size: "50m"
+    environment:
+      REACT_APP_LAMP_RESEARCHER_ALIAS: 'Investigator'
+    networks:
+      - public
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+    deploy:
+      mode: replicated
+      update_config:
+        order: start-first
+        failure_action: rollback
+      labels:
+        portainer.autodeploy: 'true'
+        traefik.enable: 'true'
+        traefik.http.routers.lamp_dashboard.entryPoints: 'websecure'
+        traefik.http.routers.lamp_dashboard.rule: 'Host(`dashboard.example.com`)'
+        traefik.http.routers.lamp_dashboard.tls.certresolver: 'default'
+        traefik.http.services.lamp_dashboard.loadbalancer.server.port: 80
+      placement:
+        constraints:
+          - node.role == manager
+networks:
+  public:
+    external: true
 ```
 
 ## How to Connect
@@ -45,6 +152,10 @@ test_data = {
 
 ```
 
+Now run the dockerfile
+```
+docker stack deploy --compose-file lamp.yml lamp
+```
 
 ## Logging in as as an Admin
 
@@ -303,8 +414,38 @@ for index, activity_event in enumerate(activity_events):
 ```
 
 We can also save the activities in a CSV file through this method. 
-```
-paste here
+```python
+import pandas as pd
+
+participant_1 = "U1679776962"
+activity_events = LAMP.ActivityEvent.all_by_participant(participant_1)['data']
+events = LAMP.SensorEvent.all_by_participant(participant_1, origin='lamp.gps.contextual')['data']
+
+data = []
+
+for index, activity_event in enumerate(activity_events):
+    print(f"Activity Event {index + 1}: {activity_event}")
+    
+    if 'temporal_slices' in activity_event:
+        for slice_data in activity_event['temporal_slices']:
+            data.append({
+                'event_type': 'Mental Health Assessment',
+                'timestamp': activity_event['timestamp'],
+                'item': slice_data['item'],
+                'value': slice_data['value'],
+                'duration': slice_data['duration']
+            })
+    elif 'static_data' in activity_event:
+        data.append({
+            'event_type': 'Game or Task',
+            'timestamp': activity_event['timestamp'],
+            'score': activity_event['static_data']['score'],
+            'total_attempts': activity_event['static_data']['total_attempts'],
+        })
+
+if len(data) > 0:
+    df1 = pd.DataFrame(data)
+    print(df1.head(20))
 ```
 
 ### Getting Sensor Event Data
@@ -351,8 +492,6 @@ If you do not want to use Python, you can download a CSV file from this screen u
 ![](https://github.com/jas-tang/AHI_mindLAMP/blob/main/images/15.JPG)
 
 ## Issues found in mindLAMP Official Documentation
-
-- INSERT DOCUMENTATION HERE FOR ISSUES THAT YOU PREVIOUSLY FOUND
 
 Posted code:
 ```python import LAMP
@@ -413,3 +552,19 @@ if len(data) > 0:
     print(df1.head(20))
 ```
 This code also creates a dataframe for data analysis.
+
+When setting up Sensors, a similar issue reoccurs in the official mindLAMP documentation. 
+```
+endpoint = 'https://mindlamp.api.{YOUR_ENDPOINT}.com/sensor_spec'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic {USER}:{PASSWORD},
+    }
+bodytosend = {"name":"lamp.insert_here"}
+response = requests.post(endpoint, headers=headers, json=bodytosend)
+print(response.status_code)
+print(response.text)
+```
+The official docmentation uses "ID" instead of "name", which causes an error. 
+
+
